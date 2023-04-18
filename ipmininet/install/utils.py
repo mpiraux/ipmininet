@@ -107,6 +107,12 @@ class Fedora(Distribution):
     INSTALL_CMD = "yum -y install"
     UPDATE_CMD = "true"
     PIP_CMD = "pip"
+    
+class Rocky(Distribution):
+    NAME = "Rocky Linux"
+    INSTALL_CMD = "dnf -y install"
+    UPDATE_CMD = "true"
+    PIP_CMD = "pip3"
 
 
 def supported_distributions() -> List[Type]:
@@ -125,5 +131,8 @@ def identify_distribution() -> Optional[Distribution]:
 
     if os.path.exists("/etc/fedora-release"):
         return Fedora()
+    
+    if os.path.exists("/etc/system-release"):
+        return Rocky()
 
     return None

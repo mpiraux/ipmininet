@@ -60,7 +60,7 @@ def parse_args():
 def install_mininet(output_dir: str, pip_install=True):
     dist.install("git")
 
-    if dist.NAME == "Fedora":
+    if dist.NAME == "Fedora" or dist.NAME == "Rocky Linux":
         mininet_opts = "-fnp"
         dist.install("openvswitch", "openvswitch-devel", "openvswitch-test")
         sh("systemctl enable openvswitch")
@@ -90,7 +90,7 @@ def install_libyang(output_dir: str):
     dist.install("git", "cmake")
     if dist.NAME == "Ubuntu" or dist.NAME == "Debian":
         dist.install("libpcre3-dev")
-    elif dist.NAME == "Fedora":
+    elif dist.NAME == "Fedora" or dist.NAME == "Rocky Linux":
         dist.install("pcre-devel")
 
     sh("git clone https://github.com/CESNET/libyang.git", cwd=output_dir)
@@ -112,17 +112,24 @@ def link_to_standard_dir(base_dir: str, standard_dir: str):
 
 def install_frrouting(output_dir: str):
     dist.install("autoconf", "automake", "libtool", "make", "gcc", "groff",
-                 "patch", "make", "bison", "flex", "gawk", "texinfo",
-                 "python3-pytest")
+                 "patch", "make", "bison", "flex", "gawk", "texinfo")
+    if dist.NAME != "Rocky Linux":
+        dist.install("python3-pytest")
+    else:
+        sh("python3 -m pip install pytest")
 
     if dist.NAME == "Ubuntu" or dist.NAME == "Debian":
         dist.install("libreadline-dev", "libc-ares-dev", "libjson-c-dev",
                      "perl", "python3-dev", "libpam0g-dev", "libsystemd-dev",
                      "libsnmp-dev", "pkg-config", "libcap-dev")
-    elif dist.NAME == "Fedora":
+    elif dist.NAME == "Fedora" or dist.NAME == "Rocky Linux":
         dist.install("readline-devel", "c-ares-devel", "json-c-devel",
-                     "perl-core", "python3-devel", "pam-devel", "systemd-devel",
+                     "perl-core", "pam-devel", "systemd-devel",
                      "net-snmp-devel", "pkgconfig", "libcap-devel")
+        if dist.NAME == "Fedora":
+            dist.install("python3-devel")
+        elif dist.NAME == "Rocky Linux":
+            dist.install("python38-devel")
 
     install_libyang(output_dir)
 
@@ -191,7 +198,7 @@ def install_exabgp(output_dir: str, may_fail=False):
 
 
 def update_grub():
-    if dist.NAME == "Fedora":
+    if dist.NAME == "Fedora" or dist.NAME == "Rocky Linux":
         cmd = "grub2-mkconfig --output=/boot/grub2/grub.cfg"
     elif dist.NAME == "Ubuntu" or dist.NAME == "Debian":
         cmd = "update-grub"

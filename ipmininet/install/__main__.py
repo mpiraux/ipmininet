@@ -30,7 +30,7 @@ if __name__ == "__main__":
     if args.all or args.install_named:
         if dist.NAME == "Ubuntu" or dist.NAME == "Debian":
             dist.install("bind9")
-        elif dist.NAME == "Fedora":
+        elif dist.NAME == "Fedora"  or dist.NAME == "Rocky Linux":
             dist.install("bind")
 
     # Install IPMininet
@@ -48,8 +48,12 @@ if __name__ == "__main__":
     # Install test dependencies
 
     dist.install("bridge-utils", "traceroute", "nmap", "iperf3")
-    if dist.NAME == "Fedora":
-        dist.install("nc", "bind-utils", "wireshark", "tc", "kernel-modules-extra")
+    if dist.NAME == "Fedora"  or dist.NAME == "Rocky Linux":
+        dist.install("nc", "bind-utils", "wireshark", "kernel-modules-extra")
+        if dist.NAME == "Rocky Linux":
+            dist.install("iproute-tc")
+        else:
+            dist.install("tc")
     else:
         dist.install("netcat-openbsd", "dnsutils", "tshark")
 
